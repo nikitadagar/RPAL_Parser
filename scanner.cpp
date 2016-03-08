@@ -1,14 +1,8 @@
-#include <iostream>
-#include <fstream>
-#include <unordered_set>
-#include "scanner.h"
-
-using namespace std;
-
-ifstream in_stream;
+#include "header.h"
 
 string const _DIGIT = "DIGIT";
 string const _STRING = "STRING";
+string const _IDENTIFIER = "IDENTIFIER";
 
 //creating a hashset of all token types
 	
@@ -22,82 +16,118 @@ string const operator_symbol_list[] = {"+", "-", "*", "<", ">", "&", ".", "@", "
 unordered_set<string> operator_symbols(operator_symbol_list, operator_symbol_list + sizeof(operator_symbol_list) / sizeof(operator_symbol_list[0]));
 
 
-bool is_next_token (string s) {
+//takes in the token that we're looking for
+//returns the next token found
+string next_token (string s) {
 
 	remove_comment();
 	remove_spaces();
 
 	if (identifiers.count(s)) {
-		cout << "Identifier found ";
+		// cout << "Identifier found \n";
 		return is_identifier(s);
+	}
+	else if (s == _IDENTIFIER) {
+		// cout << "Looking for any Identifier \n";
+		return is_any_identifier();
 	} 
 	else if (punctuations.count(s)) {
-		cout << "punctuation found";
+		// cout << "punctuation found \n";
 		return is_punctuation(s);
 	}
 	else if (s == _DIGIT){
-		cout << "DIGIT found";
+		// cout << "DIGIT found\n";
 		return is_digit();
 	}
 	else if (s == _STRING){
-		cout << "string found";
+		// cout << "string found\n";
 		return is_string();
 	}
 	else if (operator_symbols.count(string(1,s[0]))) {
-		cout << "operator_symbol found";
+		// cout << "operator_symbol found\n";
 		return is_operator(s);
 	}
 	else {
 		cout << "Next token not found";
-		return false;
+		return "";
 	}
 }
 
-//checks if the given string is an identifier
-bool is_identifier (string s){
+//checks if the given string is the given identifier
+string is_identifier (string s){
 
 	string token;
 	char c;
+
+	if (isalpha(in_stream.peek())) {
+		while (isalpha(in_stream.peek()) || isdigit(in_stream.peek()) || (in_stream.peek()) == '_'){
+			token += in_stream.get();
+		}
+		if (token == s) {	//we found the given identifier
+			// TODO: build_tree
+			my_putback(token);
+			return token;
+		} else {	//if the next token is not the given identifier, we put it back
+			my_putback(token);
+			return "";
+		}
+	}
+	return "";
+}
+
+//checks if the next token is any of the identifiers
+//returns the length of the identifier found
+string is_any_identifier () {
+
+	string token = "";
 
 	if (isalpha(in_stream.peek())) {
 		
 		while (isalpha(in_stream.peek()) || isdigit(in_stream.peek()) || (in_stream.peek()) == '_'){
 			token += in_stream.get();
 		}
-		if (token == s) {
-			return true;
-		} else {
-			my_putback(token);
-		}
+		my_putback (token);
+		return token;
 	}
-	return false;
+	else {
+		my_putback (token);
+		return "";
+	}
 }
 
 //checks if the next token is the given punctuation 
-bool is_punctuation (string s) {
+string is_punctuation (string s) {
+
+	char c = in_stream.peek();
 	
-	if (in_stream.peek() == s[0]) {
-		return true;
+	if (c == s[0]) {
+		return s;
 	} else {
-		return false;
+		return "";
 	}
 }
 
 //checks if the next token is an integer
-bool is_digit () {
+string is_digit () {
+
+	string token;
 
 	if (isdigit(in_stream.peek())) {
+
 		while (isdigit(in_stream.peek())) {
-			in_stream.get();
+			token += in_stream.get();
 		}
-		return true;
+		// TODO: build_tree
+		my_putback(token);
+		return token;
 	} else {
-		return false;
+		my_putback (token);
+		return "";
 	}
 }
 
-//checks if the next token is an identifier 
-bool is_operator (string s) {
+//checks if the next token is an operator
+string is_operator (string s) {
 
 	string c;
 	string token;
@@ -110,15 +140,17 @@ bool is_operator (string s) {
 	}
 
 	if (token == s) {
-		return true;
+		my_putback(token);
+		return token;
 	}
 	else {
 		my_putback(token);
-		return false; 
+		return ""; 
 	}
 }
 
-bool is_string () {
+//checks if the next token is any string
+string is_string () {
 
 	string token;
 	int flag;   	// flag used to check if the quotes were closed before EOF
@@ -126,58 +158,48 @@ bool is_string () {
 	if (in_stream.peek() == '\"') {
 		
 		flag = 1;
-		in_stream.get();
+		token += in_stream.get();
 
 		QUOTE: while (in_stream.peek() != '\"') {
 
 			if (in_stream.eof()) {
-				return false;
+				return "";
 			}
 
 			token += in_stream.get();
 		}
 
-		in_stream.get();
+		token += in_stream.get();
 		flag = 0;
 
 		if (in_stream.peek() == '\"') {
-			in_stream.get();
+			token += in_stream.get();
 			flag = 1;
 			goto QUOTE;
 		}
 
-		if (flag == 0) return true;
-		else return false;
+		if (flag == 0) {
+			// TODO: build_tree
+			return token;
+		}
+		else return "";
 	}
 	else {
-		return false;
+		return "";
 	}
 }
 
-int main (int argc, char** argv){
+//read function moves the instream pointer ahead to consume the given token
+void read (string s) {
 
-	string file = argv[1];
-    in_stream.open(file.c_str());
+	remove_comment();
+	remove_spaces();
 
-  	if (is_next_token("let") == true){
-  		cout << " YES " << "\n";
-  	} else {
-  		cout << " NO " << "\n";
-  	}
+	int len = s.length();
 
-  	if (is_next_token("STRING") == true){
-  		cout << " YES " << "\n";
-  	} else {
-  		cout << " NO " << "\n";
-  	}
-  	if (is_next_token("=") == true){
-  		cout << " YES " << "\n";
-  	} else {
-  		cout << " NO " << "\n";
-  	}
-
-  	in_stream.close();
-  	return 0;
+	for (int i=0; i<len; i++) {
+		in_stream.get();
+	}
 }
 
 // 	--------- HELPER FUNCTIONS ----------
@@ -195,11 +217,15 @@ bool is_comment () {
 
 	string s;
 
-	s = in_stream.get();
-	s += in_stream.get();
+	if (!in_stream.eof()) {
+		s += in_stream.get();
+	}
+
+	if (!in_stream.eof()) {
+		s += in_stream.get();
+	}
 
 	if (s == "//") {
-		cout << "\n saw //";
 		return true;
 	}
 	else {
@@ -220,7 +246,8 @@ void remove_comment () {
 
 //adds the string back to the beginning of the file
 void my_putback (string s) {
-    int size = s.size();
+	// cout <<"putback : "<< s << "\n";
+    int size = s.length();
     const char* ch = s.c_str();
     for(int i = size-1; i >= 0; i--){
         in_stream.putback(ch[i]);
