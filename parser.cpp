@@ -4,7 +4,7 @@
 ifstream in_stream;
 
 //procedure for Non terminal E
-// void E () {
+void E () {
 
 // 	if (is_next_token("let")) {
 // 		cout << "pYES";
@@ -16,7 +16,23 @@ ifstream in_stream;
 // 		Ew ();
 // 	}
 	
+}
+
+
+
+// void Ap () {
+
+// 	R();
+
+// 	while (next_token("@") == "@"){
+// 		read("@");
+		
+// 		if (next_token("IDENTIFIER") != ""){
+// 			read()
+// 		}
+// 	}
 // }
+
 
 void Rn () {
 
@@ -173,34 +189,15 @@ void Vb () {
 }
 
 void Vl () {
-	
-	string nt;
-	nt = next_token("IDENTIFIER");
 
-	if (nt != "") {
-		read (nt);
-		
-		nt = next_token(",");
+	read_identifier();
 
-		while (nt == ",") { 	//if the token returned is the one we want
-
-			read (nt);
-
-			if (next_token("IDENTIFIER") == "") {
-				cout << "ERROR : Identifier expected after comma in variable list\n";
-				break;
-			}
-			else {
-				read (next_token("IDENTIFIER"));
-			}
-			nt = next_token(",");
-		}	//while
-	// build_tree (",", 0);
-	}
-	else {
-		cout << "ERROR : Identifier expected in variable list\n";
+	while (next_token(",") == "," ){
+		read(",");
+		read_identifier();
 	}
 }
+
 
 int main (int argc, char** argv){
 
@@ -214,7 +211,6 @@ int main (int argc, char** argv){
   	// }
 
   	Vb();
-
 
   	in_stream.close();
   }

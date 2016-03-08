@@ -18,6 +18,11 @@ string is_digit();
 string is_operator(std::string);
 string is_string();
 
+void read_identifier();
+void read_string();
+void read_integer();
+void read(std::string);
+
 //HELPER FUNCTIONS FOR SCANNER
 void remove_spaces();
 bool is_comment();
@@ -26,7 +31,7 @@ void my_putback(std::string);
 
 // PARSER FUNCTIONS FOR NON TERMINALS
 
-
+void E();
 void D();
 void Da();
 void Dr();

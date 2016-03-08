@@ -189,8 +189,55 @@ string is_string () {
 	}
 }
 
+void read_identifier () {
+
+	remove_comment();
+	remove_spaces();
+
+	string s = is_any_identifier();
+
+	if (s == "") {
+		cout << "ERROR : Expecting an Identifier\n";
+	}
+	else {
+		read(s);
+	}
+}
+
+void read_string () {
+
+	remove_comment();
+	remove_spaces();
+
+	string s = is_string();
+
+	if (s == "") {
+		cout << "ERROR : Expecting an string\n";
+	}
+	else {
+		read(s);
+	}
+}
+
+void read_integer () {
+
+	remove_comment();
+	remove_spaces();
+
+	string s = is_digit();
+
+	if (s == "") {
+		cout << "ERROR : Expecting an integer\n";
+	}
+	else {
+		read(s);
+	}
+}
+
 //read function moves the instream pointer ahead to consume the given token
 void read (string s) {
+
+	string token;
 
 	remove_comment();
 	remove_spaces();
@@ -198,7 +245,11 @@ void read (string s) {
 	int len = s.length();
 
 	for (int i=0; i<len; i++) {
-		in_stream.get();
+		token += in_stream.get();
+	}
+
+	if (token != s) {
+		cout << "ERROR : Expected " << s << "but found " << token << "\n";
 	}
 }
 
@@ -217,11 +268,11 @@ bool is_comment () {
 
 	string s;
 
-	if (!in_stream.eof()) {
+	if (in_stream.peek() == '/') {
 		s += in_stream.get();
 	}
 
-	if (!in_stream.eof()) {
+	if (in_stream.peek() == '/') {
 		s += in_stream.get();
 	}
 
