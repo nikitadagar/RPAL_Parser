@@ -25,6 +25,12 @@ void remove_comment();
 void my_putback(std::string);
 
 // PARSER FUNCTIONS FOR NON TERMINALS
+
+
+void D();
+void Da();
+void Dr();
+void Db();
 void Vl();
 void Vb();
 

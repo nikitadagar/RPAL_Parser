@@ -18,37 +18,131 @@ ifstream in_stream;
 	
 // }
 
-// void Db () {
+void Rn () {
 
-// 	if (next_token("(") != ""){
-// 		read ("(");
+	if (next_token("IDENTIFIER") != "") {
+		read(next_token("IDENTIFIER"));
+	}
+	else if (next_token("INTEGER") != "") {
+		read(next_token("INTEGER"));
+	}
+	else if (next_token("STRING") != ""){
+		read (next_token("STRING"));
+	}
+	else if (next_token("true") == "true") {
+		read("true");
+	}
+	else if (next_token("false") == "false") {
+		read("false");
+	}
+	else if (next_token("nil") == "nil") {
+		read("nil");
+	}
+	else if (next_token("dummy") == "dummy") {
+		read("dummy");
+	}
+	else if (next_token("(") != "") {
+		read("(");
+		E ();
+		if (next_token(")") == ")") {
+			read(")");
+		}
+		else {
+			cout << "ERROR : Expecting )";
+		}
+	}
+	else {
+		cout << "ERROR in Rators and Rands";
+	}
+}
 
-// 		D ();
+void D () {
+	
+	Da();
 
-// 		if (next_token(")") != ""){ 	//if next token is )
-// 			read (")");
+	if (next_token("within") == "within"){
+		read("within");
+		D();
+	}
+	else if (next_token(";") == ";"){
+		read (";");
+	}
+	else {
+		cout << "ERROR : Expecting ;";
+	}
+}
 
-// 			if (next_token(";") != ""){ 	//if next token is ;
-// 				read(";");
-// 			}
-// 			else {
-// 				cout << "ERROR : Expecting ; in definition\n";
-// 			}
-// 		}
-// 		else {
-// 			cout << "ERROR : Expecting ) in definition\n";
-// 		}
-// 	}
-// 	else if (next_token("IDENTIFIER")){
-// 		read (next_token("IDENTIFIER"));
+void Da () {
 
-// 		Vb();
+	Dr ();
 
-// 		while (next_token("=") == "" || in_stream.peek() )
-// 	}
+	while (next_token("and") == "and"){
+		read("and");
+		Dr ();
+	}
+	if (next_token(";") == ";") {
+		read(";");
+	}
+	else {
+		cout << "ERROR : Expecting ; in definition";
+	}
+}
 
+void Dr () {
+	if (next_token("rec") == "rec") {
+		read("rec");
+	}
+	Db();
+}
 
-// }
+void Db () {
+
+	if (next_token("(") != ""){
+		read ("(");
+
+		D ();
+
+		if (next_token(")") == ")"){ 	//if next token is )
+			read (")");
+
+			if (next_token(";") == ";"){ 	//if next token is ;
+				read(";");
+			}
+			else {
+				cout << "ERROR : Expecting ; in definition\n";
+			}
+		}
+		else {
+			cout << "ERROR : Expecting ) in definition\n";
+		}
+	}
+	else if (next_token("IDENTIFIER") != ""){
+		read (next_token("IDENTIFIER"));
+
+		Vb();
+
+		while (next_token("=") != "=") {
+			Vb();
+		}
+		if (next_token("=") == "="){
+			read ("=");
+			E ();
+		}
+		else {
+			cout << "ERROR : Expecting = but not found in definition";
+		}
+	}
+	else {
+		Vl();
+		 if (next_token("=") == "=") {
+		 	read ("=");
+		 	E();
+		 }
+		 else {
+		 	cout << "ERROR : Expecting = but not found in definition";
+		 }
+	}
+}
 
 void Vb () {
 
