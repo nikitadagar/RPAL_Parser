@@ -4,10 +4,25 @@
 #include <iostream>
 #include <fstream>
 #include <unordered_set>
+#include <stack>
 
 using namespace std;
 
 extern ifstream in_stream;
+
+// Node structure
+typedef struct nodeType{
+    std::string name;
+    struct nodeType** child;
+    int count;
+} Node;
+
+//Building and displaying AST funcitons
+void display_tree(Node*);
+void display_tree(Node*, int);
+void build_tree(string, int);
+
+//SCANNER FUNCTIONS
 
 string next_token(std::string);
 

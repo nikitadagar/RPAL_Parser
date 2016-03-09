@@ -55,7 +55,7 @@ string next_token (string s) {
 
 //checks if the given string is the given identifier
 string is_identifier (string s){
-
+	// cout << "\nCalled is_identifier asking for " << s;
 	string token;
 	char c;
 
@@ -66,6 +66,7 @@ string is_identifier (string s){
 		if (token == s) {	//we found the given identifier
 			// TODO: build_tree
 			my_putback(token);
+			// cout << "\nfound "<< token;
 			return token;
 		} else {	//if the next token is not the given identifier, we put it back
 			my_putback(token);
@@ -210,6 +211,7 @@ void read_identifier () {
 		poison_pill();
 	}
 	else {
+		build_tree("<ID:" + s + ">", 0);
 		read(s);
 	}
 }
@@ -226,6 +228,7 @@ void read_string () {
 	}
 	else {
 		// cout << "\nString received : " << s;
+		build_tree("<STR:\'" + s + "\'>", 0);
 		read(s);
 	}
 }
@@ -241,6 +244,7 @@ void read_digit () {
 		cout << "ERROR : Expecting an integer\n";
 	}
 	else {
+		build_tree("<INT:" + s + ">", 0);
 		read(s);
 	}
 }
@@ -263,7 +267,7 @@ void read (string s) {
 		cout << "ERROR : Expected " << s << "but found " << token << "\n";
 	}
 	else {
-		cout << "Reading " << s << "\n";
+		// cout << "Reading " << s << "\n";
 	}
 }
 
