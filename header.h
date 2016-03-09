@@ -28,6 +28,7 @@ void remove_spaces();
 bool is_comment();
 void remove_comment();
 void my_putback(std::string);
+void poison_pill();
 
 // PARSER FUNCTIONS FOR NON TERMINALS
 

@@ -1,1 +1,1 @@
-(as) 
+let x = 3 in Print(x + y)        

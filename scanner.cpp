@@ -48,7 +48,7 @@ string next_token (string s) {
 		return is_operator(s);
 	}
 	else {
-		cout << "Next token not found";
+		cout << "Next token not found\n";
 		return "";
 	}
 }
@@ -87,10 +87,16 @@ string is_any_identifier () {
 			token += in_stream.get();
 		}
 		my_putback (token);
-		return token;
+		if (identifiers.count(token)){
+			return "";
+		} else {
+			return token;
+		}
 	}
 	else {
-		my_putback (token);
+		if (token != ""){
+			my_putback (token);
+		}
 		return "";
 	}
 }
@@ -109,7 +115,6 @@ string is_punctuation (string s) {
 
 //checks if the next token is an integer
 string is_digit () {
-
 	string token;
 
 	if (isdigit(in_stream.peek())) {
@@ -121,7 +126,9 @@ string is_digit () {
 		my_putback(token);
 		return token;
 	} else {
-		my_putback (token);
+		if (token != ""){
+			my_putback (token);
+		}
 		return "";
 	}
 }
@@ -180,6 +187,8 @@ string is_string () {
 
 		if (flag == 0) {
 			// TODO: build_tree
+			// cout << "\nString  : " << token;
+			my_putback(token);
 			return token;
 		}
 		else return "";
@@ -198,6 +207,7 @@ void read_identifier () {
 
 	if (s == "") {
 		cout << "ERROR : Expecting an Identifier\n";
+		poison_pill();
 	}
 	else {
 		read(s);
@@ -215,11 +225,12 @@ void read_string () {
 		cout << "ERROR : Expecting an string\n";
 	}
 	else {
+		// cout << "\nString received : " << s;
 		read(s);
 	}
 }
 
-void read_integer () {
+void read_digit () {
 
 	remove_comment();
 	remove_spaces();
@@ -251,6 +262,9 @@ void read (string s) {
 	if (token != s) {
 		cout << "ERROR : Expected " << s << "but found " << token << "\n";
 	}
+	else {
+		cout << "Reading " << s << "\n";
+	}
 }
 
 // 	--------- HELPER FUNCTIONS ----------
@@ -266,7 +280,7 @@ bool is_comment () {
 
 	remove_spaces();
 
-	string s;
+	string s = "";
 
 	if (in_stream.peek() == '/') {
 		s += in_stream.get();
@@ -279,10 +293,11 @@ bool is_comment () {
 	if (s == "//") {
 		return true;
 	}
-	else {
+	else if(s != "") {
 		my_putback(s);
 		return false;
 	}
+	return false;
 }
 
 //removes the comment if next token is //
@@ -300,6 +315,7 @@ void my_putback (string s) {
 	// cout <<"putback : "<< s << "\n";
     int size = s.length();
     const char* ch = s.c_str();
+    
     //for older versions of C++
     if (in_stream.fail()) {
     	in_stream.clear();
@@ -308,4 +324,17 @@ void my_putback (string s) {
     for(int i = size-1; i >= 0; i--){
         in_stream.putback(ch[i]);
     }
+}
+
+ofstream out_stream;
+
+void helper (string filename) {
+	out_stream.open(filename, ios::app);
+	out_stream << " ";
+	out_stream.close();
+}
+
+void poison_pill (){
+	in_stream.close();
+	exit(0);
 }

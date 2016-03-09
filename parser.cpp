@@ -6,16 +6,68 @@ ifstream in_stream;
 //procedure for Non terminal E
 void E () {
 
-// 	if (is_next_token("let")) {
-// 		cout << "pYES";
-// 	}
-// 	else if (is_next_token("fn")) {
+	if (next_token("let") == "let"){
+		read("let");
+		D();
+		read("in");
+		E();
+		//build tree
+	}
+	else if (next_token("fn") == "fn") {
+		read("fn");
+		int n=1;
+		Vb();
+		//while we don't see . keep calling Vb
+		while (next_token(".") != ".") {
+			n++;
+			Vb();
+		}
+		read(".");
+		E();
+		//build tree
+	}
+	else {
+		Ew();
+	}
+}
 
-// 	}
-// 	else {
-// 		Ew ();
-// 	}
-	
+void Ew() {
+	T();
+
+	if (next_token("where") == "where"){
+		read("where");
+		Dr();
+		//build tree
+	}
+}
+
+void T () {
+	Ta();
+
+	while (next_token(",") == ","){
+		read(",");
+		Ta();
+		//build tree here
+	}
+}
+
+void Ta() {
+	Tc();
+
+	while (next_token("aug") == "aug"){
+		read("aug");
+		Tc();
+	}
+}
+
+void Tc() {
+	B();
+	if (next_token("->") == "->" ){
+		read("->");
+		Tc();
+		read("|");
+		Tc();
+	}
 }
 
 void B () {
@@ -90,15 +142,32 @@ void Bp () {
 
 void A () {
 
-	// if (next_token("+") == "+") {
-	// 	read("+");
-	// }
-	// else if (next_token("-") == "-") {
-	// 	read("-");
-	// }
-	// At();
-	
-	// while ()
+	if (next_token("+") == "+"){
+		read("+");
+		At();
+	}
+	else if (next_token("-") == "-"){
+		read("-");
+		At();
+		//build tree
+	}
+	else {
+		At();
+	}
+
+	while ((next_token("+") == "+") || next_token("-") == "-") {
+
+		if(next_token("+") == "+"){
+			read("+");
+			At();
+			//build tree
+		}
+		else {
+			read("-");
+			At();
+			//built tree
+		}
+	}
 
 }
 
@@ -119,9 +188,10 @@ void At () {
 void Af () {
 
 	Ap();
-	read("**");
-	Af();
-
+	if (next_token("**") == "**"){
+		read("**");
+		Af();
+	}
 }
 
 void Ap () {
@@ -140,22 +210,29 @@ void Ap () {
 void R () {
 
 	Rn ();
-	while(in_stream.peek() == ' '){
-		in_stream.get();
-		Rn();
-	}
+	
+	while ((next_token(_IDENTIFIER) != "") 
+		|| (next_token(_DIGIT) != "") 
+		|| (next_token(_STRING) != "")
+		|| (next_token("true") == "true")
+		|| (next_token("false") == "false")
+		|| (next_token("nil") == "nil")
+		|| (next_token("dummy") == "dummy")
+		|| (next_token("(") == "(")) {
+			Rn();
+		}
 }
 
 void Rn () {
 
-	if (next_token("IDENTIFIER") != "") {
-		read(next_token("IDENTIFIER"));
+	if (next_token(_IDENTIFIER) != "") {
+		read_identifier();
 	}
-	else if (next_token("INTEGER") != "") {
-		read(next_token("INTEGER"));
+	else if (next_token(_DIGIT) != "") {
+		read_digit();
 	}
-	else if (next_token("STRING") != ""){
-		read (next_token("STRING"));
+	else if (next_token(_STRING) != ""){
+		read_string();
 	}
 	else if (next_token("true") == "true") {
 		read("true");
@@ -169,26 +246,24 @@ void Rn () {
 	else if (next_token("dummy") == "dummy") {
 		read("dummy");
 	}
-	else if (next_token("(") != "") {
+	else if (next_token("(") == "(") {
 		read("(");
 		E ();
-		if (next_token(")") == ")") {
-			read(")");
-		}
-		else {
-			cout << "ERROR : Expecting )";
-		}
+		read(")");
 	}
-	else {
-		cout << "ERROR in Rators and Rands";
+	//should never reach this else because of the select sets
+	else if (in_stream.peek() != EOF) {
+		cout << "ERROR : expecting Rn \n";
 	}
 }
 
 void D () {
 	
 	Da();
-	read("within");
-	D();
+	if (next_token("within") == "within"){
+		read("within");
+		D();
+	}
 }
 
 void Da () {
@@ -210,35 +285,34 @@ void Dr () {
 
 void Db () {
 
-	if (next_token("(") != ""){
-		read ("(");
-
-		D ();
-
+	if (next_token("(") == "("){
+		read("(");
+		D();
 		read(")");
 	}
-	else if (next_token("IDENTIFIER") != ""){
-		read (next_token("IDENTIFIER"));
-
-		Vb();
-
-		while (next_token("=") != "=") {
-			Vb();
-		}
-		read("=");
-		E();
-	}
 	else {
-		Vl();
-		read("=");
-		E();
+		read_identifier();
+		if ((next_token(_IDENTIFIER) != "") || (next_token("(") == "(")){
+			while ((next_token(_IDENTIFIER) != "") || (next_token("(") == "(")){
+				Vb();
+			}
+			read("=");
+			E();
+		}
+		else {
+			if (next_token(",") == ","){
+				Vl();
+			}
+			read("=");
+			E();
+		}
 	}
 }
 
 void Vb () {
 
-	if (next_token("IDENTIFIER") != "") {
-		read (next_token("IDENTIFIER"));
+	if (next_token(_IDENTIFIER) != "") {
+		read (next_token(_IDENTIFIER));
 	}
 	else if (next_token("(") != "") {
 		read ("(");
@@ -266,9 +340,14 @@ void Vl () {
 
 	read_identifier();
 
-	while (next_token(",") == "," ){
-		read(",");
-		read_identifier();
+	if (next_token(",") == ","){
+		while (next_token(",") == "," ){
+			read(",");
+			read_identifier();
+		}
+	}
+	else {
+		cout << "ERROR : expecting , in variable list\n";
 	}
 }
 
@@ -276,15 +355,11 @@ void Vl () {
 int main (int argc, char** argv){
 
 	string file = argv[1];
+	helper(file);
     in_stream.open(file.c_str());
 
-  	// if (is_next_token("let") == true){
-  	// 	cout << " YES " << "\n";
-  	// } else {
-  	// 	cout << " NO " << "\n";
-  	// }
-
-  	Vb();
+  	E();
+    // cout << is_string();
 
   	in_stream.close();
   }
