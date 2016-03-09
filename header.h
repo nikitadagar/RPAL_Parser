@@ -32,6 +32,20 @@ void my_putback(std::string);
 // PARSER FUNCTIONS FOR NON TERMINALS
 
 void E();
+void Ew();
+void T();
+void Ta();
+void Tc();
+void Bt();
+void Bs();
+void Bp();
+void B();
+void A();
+void At();
+void Af();
+void Ap();
+void R();
+void Rn();
 void D();
 void Da();
 void Dr();

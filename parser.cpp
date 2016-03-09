@@ -18,21 +18,133 @@ void E () {
 	
 }
 
+void B () {
+	Bt ();
+	while (next_token("or") == "or"){
+		read("or");
+		Bt();
+	}
+}
 
+void Bt () {
+	Bs ();
+	while (next_token("&") == "&"){
+		read("&");
+		Bs();
+	}
+}
 
-// void Ap () {
+void Bs () {
 
-// 	R();
+	if (next_token("not") == "not") {
+		read("not");
+	}
+	Bp();
+}
 
-// 	while (next_token("@") == "@"){
-// 		read("@");
-		
-// 		if (next_token("IDENTIFIER") != ""){
-// 			read()
-// 		}
-// 	}
-// }
+void Bp () {
 
+	A();
+
+		if (next_token("gr") == "gr") {
+			read("gr");
+			A();
+		}
+		else if (next_token(">") == ">") {
+			read(">");
+			A();
+		}
+		else if (next_token("ge") == "ge") {
+			read("ge");
+			A();
+		}
+		else if (next_token(">=") == ">=") {
+			read(">=");
+			A();
+		}
+		else if (next_token("ls") == "ls") {
+			read("ls");
+			A();
+		}
+		else if (next_token("<") == "<") {
+			read("<");
+			A();
+		}
+		else if (next_token("le") == "le") {
+			read("le");
+			A();
+		}
+		else if (next_token("<=") == "<=") {
+			read("<=");
+			A();
+		}
+		else if (next_token("eq") == "eq") {
+			read("eq");
+			A();
+		}
+		else if (next_token("ne") == "ne") {
+			read("ne");
+			A();
+		}
+}
+
+void A () {
+
+	// if (next_token("+") == "+") {
+	// 	read("+");
+	// }
+	// else if (next_token("-") == "-") {
+	// 	read("-");
+	// }
+	// At();
+	
+	// while ()
+
+}
+
+void At () {
+
+	Af ();
+
+	if (next_token("*") == "*") {
+		read("*");
+		At();
+	}
+	else if (next_token("/") == "/") {
+		read("/");
+		At();
+	}
+}
+
+void Af () {
+
+	Ap();
+	read("**");
+	Af();
+
+}
+
+void Ap () {
+
+	R();
+
+	while (next_token("@") == "@"){
+		read("@");
+
+		read_identifier();
+
+		R ();
+	}
+}
+
+void R () {
+
+	Rn ();
+	while(in_stream.peek() == ' '){
+		in_stream.get();
+		Rn();
+	}
+}
 
 void Rn () {
 
@@ -75,17 +187,8 @@ void Rn () {
 void D () {
 	
 	Da();
-
-	if (next_token("within") == "within"){
-		read("within");
-		D();
-	}
-	else if (next_token(";") == ";"){
-		read (";");
-	}
-	else {
-		cout << "ERROR : Expecting ;";
-	}
+	read("within");
+	D();
 }
 
 void Da () {
@@ -95,12 +198,6 @@ void Da () {
 	while (next_token("and") == "and"){
 		read("and");
 		Dr ();
-	}
-	if (next_token(";") == ";") {
-		read(";");
-	}
-	else {
-		cout << "ERROR : Expecting ; in definition";
 	}
 }
 
@@ -118,19 +215,7 @@ void Db () {
 
 		D ();
 
-		if (next_token(")") == ")"){ 	//if next token is )
-			read (")");
-
-			if (next_token(";") == ";"){ 	//if next token is ;
-				read(";");
-			}
-			else {
-				cout << "ERROR : Expecting ; in definition\n";
-			}
-		}
-		else {
-			cout << "ERROR : Expecting ) in definition\n";
-		}
+		read(")");
 	}
 	else if (next_token("IDENTIFIER") != ""){
 		read (next_token("IDENTIFIER"));
@@ -140,23 +225,13 @@ void Db () {
 		while (next_token("=") != "=") {
 			Vb();
 		}
-		if (next_token("=") == "="){
-			read ("=");
-			E ();
-		}
-		else {
-			cout << "ERROR : Expecting = but not found in definition";
-		}
+		read("=");
+		E();
 	}
 	else {
 		Vl();
-		 if (next_token("=") == "=") {
-		 	read ("=");
-		 	E();
-		 }
-		 else {
-		 	cout << "ERROR : Expecting = but not found in definition";
-		 }
+		read("=");
+		E();
 	}
 }
 
@@ -165,7 +240,6 @@ void Vb () {
 	if (next_token("IDENTIFIER") != "") {
 		read (next_token("IDENTIFIER"));
 	}
-
 	else if (next_token("(") != "") {
 		read ("(");
 		

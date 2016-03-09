@@ -300,6 +300,11 @@ void my_putback (string s) {
 	// cout <<"putback : "<< s << "\n";
     int size = s.length();
     const char* ch = s.c_str();
+    //for older versions of C++
+    if (in_stream.fail()) {
+    	in_stream.clear();
+    }
+
     for(int i = size-1; i >= 0; i--){
         in_stream.putback(ch[i]);
     }
