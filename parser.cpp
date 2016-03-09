@@ -439,13 +439,25 @@ void display_tree(Node *node, int level){
 
 int main (int argc, char** argv){
 
-	string file = argv[1];
-	helper(file);
-    in_stream.open(file.c_str());
+	bool ast = false;
+	string file;
 
-  	E();
-  	display_tree(s.top());
-    // cout << is_string();
+	for(int i = 1; i < argc; i++) {
+		
+		if(string(argv[i]) == "-ast") {
+			ast = true;
+		}
+		else if(argv[i][0] != '-') {
+			file = string(argv[i]);
+			helper(file);
+			in_stream.open(file.c_str());
+		}
+	}
+
+	E();
+	if (ast) {
+		display_tree(s.top());
+	}
 
   	in_stream.close();
   }

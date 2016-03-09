@@ -264,7 +264,7 @@ void read (string s) {
 	}
 
 	if (token != s) {
-		cout << "ERROR : Expected " << s << "but found " << token << "\n";
+		cout << "ERROR : Expected " << s << " but found " << token << "\n";
 	}
 	else {
 		// cout << "Reading " << s << "\n";
