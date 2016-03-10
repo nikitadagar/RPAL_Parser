@@ -25,7 +25,7 @@ void E () {
 		}
 		read(".");
 		E();
-		build_tree("lambda",n);
+		build_tree("lambda",n+1);
 	}
 	else {
 		Ew();
@@ -171,7 +171,7 @@ void A () {
 	else if (next_token("-") == "-"){
 		read("-");
 		At();
-		build_tree("-",1);
+		build_tree("neg",1);
 	}
 	else {
 		At();
@@ -306,7 +306,7 @@ void Da () {
 		while (next_token("and") == "and"){
 			read("and");
 			n++;
-			Da ();
+			Dr ();
 		}
 		build_tree("and",n);
 	}
@@ -341,7 +341,7 @@ void Db () {
 			}
 			read("=");
 			E();
-			build_tree("function_form", n+2);
+			build_tree("function_form", n + 2);
 		}
 		else {
 			if (next_token(",") == ","){
@@ -370,12 +370,7 @@ void Vb () {
 		}
 		else {
 			Vl();
-			if (next_token(")") == "") {
-				cout << "ERROR : ) expected in Variable list\n";
-			}
-			else {
-				read (")");
-			}
+			read (")");
 		}
 	}
 	else {
