@@ -418,15 +418,14 @@ void build_tree(string name, int count){
 
 void display_tree(Node *node){
     display_tree(node, 0);
-    cout<<endl;
 }
 
 void display_tree(Node *node, int level){
     if(node == NULL)
         return;
     for(int i = 1; i <= level; i++)
-        cout<<". ";
-    cout<<node->name<<endl;
+        cout<<".";
+    cout<<node->name<<" "<<endl;
 
     if(node->child == NULL)
         return;
@@ -461,4 +460,4 @@ int main (int argc, char** argv){
 
   	in_stream.close();
   }
-  
+                                                        

@@ -340,5 +340,5 @@ void helper (string filename) {
 
 void poison_pill (){
 	in_stream.close();
-	exit(0);
+	// exit(0);
 }
