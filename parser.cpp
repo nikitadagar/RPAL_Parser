@@ -196,15 +196,18 @@ void At () {
 
 	Af ();
 
-	if (next_token("*") == "*") {
-		read("*");
-		At();
-		build_tree("*", 2);
-	}
-	else if (next_token("/") == "/") {
-		read("/");
-		At();
-		build_tree("/",2);
+	while (next_token("*") == "*" || next_token("/") == "/") {
+
+		if (next_token("*") == "*") {
+			read("*");
+			Af();
+			build_tree("*", 2);
+		}
+		else if (next_token("/") == "/") {
+			read("/");
+			Af();
+			build_tree("/",2);
+		}
 	}
 }
 
