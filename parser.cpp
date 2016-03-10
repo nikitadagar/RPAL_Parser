@@ -263,19 +263,19 @@ void Rn () {
 	}
 	else if (next_token("true") == "true") {
 		read("true");
-		build_tree("true", 0);
+		build_tree("<true>", 0);
 	}
 	else if (next_token("false") == "false") {
 		read("false");
-		build_tree("false", 0);
+		build_tree("<false>", 0);
 	}
 	else if (next_token("nil") == "nil") {
 		read("nil");
-		build_tree("nil", 0);
+		build_tree("<nil>", 0);
 	}
 	else if (next_token("dummy") == "dummy") {
 		read("dummy");
-		build_tree("dummy", 0);
+		build_tree("<dummy>", 0);
 	}
 	else if (next_token("(") == "(") {
 		read("(");
