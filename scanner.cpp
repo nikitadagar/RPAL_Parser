@@ -163,13 +163,14 @@ string is_string () {
 	string token;
 	int flag;   	// flag used to check if the quotes were closed before EOF
 
-	if (in_stream.peek() == '\"') {
-		
+	if (in_stream.peek() == '\"' || in_stream.peek() == '\'') {
+
 		flag = 1;
+		char quote_type = in_stream.peek();
 		token += in_stream.get();
 
-		QUOTE: while (in_stream.peek() != '\"') {
-
+		QUOTE: while (in_stream.peek() != quote_type) {
+			cout << " instream peek : " << string(1, in_stream.peek()) << "\n";
 			if (in_stream.eof()) {
 				return "";
 			}
@@ -179,8 +180,9 @@ string is_string () {
 
 		token += in_stream.get();
 		flag = 0;
+		cout << "TOKEN is " << token << "\n";
 
-		if (in_stream.peek() == '\"') {
+		if (in_stream.peek() == '\"' || in_stream.peek() == '\'') {
 			token += in_stream.get();
 			flag = 1;
 			goto QUOTE;
@@ -228,7 +230,7 @@ void read_string () {
 	}
 	else {
 		// cout << "\nString received : " << s;
-		build_tree("<STR:\'" + s + "\'>", 0);
+		build_tree("<STR:" + s + ">", 0);
 		read(s);
 	}
 }
@@ -264,10 +266,10 @@ void read (string s) {
 	}
 
 	if (token != s) {
-		cout << "ERROR : Expected " << s << " but found " << token << "\n";
+		cout << "READ ERROR : Expected " << s << " but found " << token << "\n";
 	}
 	else {
-		// cout << "Reading " << s << "\n";
+		cout << "Reading " << s << "\n";
 	}
 }
 
