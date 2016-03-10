@@ -446,7 +446,7 @@ int main (int argc, char** argv){
 		}
 		else if(argv[i][0] != '-') {
 			file = string(argv[i]);
-			helper(file);
+			// helper(file);
 			in_stream.open(file.c_str());
 		}
 	}
