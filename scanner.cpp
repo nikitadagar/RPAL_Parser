@@ -330,14 +330,6 @@ void my_putback (string s) {
     }
 }
 
-ofstream out_stream;
-
-void helper (string filename) {
-	out_stream.open(filename, ios::app);
-	out_stream << " ";
-	out_stream.close();
-}
-
 void poison_pill (){
 	in_stream.close();
 	// exit(0);

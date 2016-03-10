@@ -14,11 +14,10 @@ extern ifstream in_stream;
 typedef struct nodeType{
     std::string name;
     struct nodeType** child;
-    int count;
+    int children;
 } Node;
 
 //Building and displaying AST funcitons
-void display_tree(Node*);
 void display_tree(Node*, int);
 void build_tree(string, int);
 

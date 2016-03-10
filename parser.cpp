@@ -397,41 +397,38 @@ void Vl () {
 	}
 }
 
-void build_tree(string name, int count){
+void build_tree(string name, int children){
     
     Node* n = new Node;
     n->name = name;
-    n->count = count; //TODO: count?
-    n->child = new Node*[count];
+    n->children = children;
+    n->child = new Node*[children];
     
-    for(int i = count-1; i >= 0; i--){
+    for(int i = children-1; i >= 0; i--)
+    {
         Node* temp = s.top();
         s.pop();
         n->child[i] = temp;
     }
-    s.push(n);
-    //stack_disp();
-    //disp_tree(s.top());
-}
 
-void display_tree(Node *node){
-    display_tree(node, 0);
+    s.push(n);
 }
 
 void display_tree(Node *node, int level){
-    if(node == NULL)
-        return;
+    
+    if(node == NULL) return;
+
+    //print the dots
     for(int i = 1; i <= level; i++)
         cout<<".";
-    cout<<node->name<<" "<<endl;
-
-    if(node->child == NULL)
-        return;
     
-    for(int i = 0; i < node->count; i++){
+    cout << node->name << " " << endl;
+
+    if(node->child == NULL) return;
+    
+    for(int i = 0; i < node->children; i++){
         display_tree(node->child[i], level+1);
     }
-    
 }
 
 int main (int argc, char** argv){
@@ -446,14 +443,13 @@ int main (int argc, char** argv){
 		}
 		else if(argv[i][0] != '-') {
 			file = string(argv[i]);
-			// helper(file);
 			in_stream.open(file.c_str());
 		}
 	}
 
 	E();
 	if (ast) {
-		display_tree(s.top());
+		display_tree(s.top(), 0);
 	}
 
   	in_stream.close();
