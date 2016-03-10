@@ -231,7 +231,7 @@ void Ap () {
 		read_identifier();
 
 		R ();
-		build_tree("@",2);
+		build_tree("@",3);
 	}
 }
 
