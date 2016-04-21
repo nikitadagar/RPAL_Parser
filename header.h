@@ -5,17 +5,26 @@
 #include <fstream>
 #include <unordered_set>
 #include <stack>
+#include <queue>
 
 using namespace std;
 
-extern ifstream in_stream;
-
 // Node structure
 typedef struct nodeType{
-    std::string name;
+    string name;
     struct nodeType** child;
     int children;
 } Node;
+
+typedef struct cseNode {
+	string name;
+	int i;	//subscript
+	string x;	//superscript
+	int k;	//pre-superscript
+} cseNode;
+
+extern ifstream in_stream;
+queue<Node*> q;
 
 //Building and displaying AST funcitons
 void display_tree(Node*, int);
@@ -67,5 +76,25 @@ void Dr();
 void Db();
 void Vl();
 void Vb();
+
+//STANDARDIZE FUNCTIONS
+
+Node* standardize(Node*);
+Node* standardizeLet(Node*);
+Node* standardizeWhere(Node*);
+Node* standardizeWithin(Node*);
+Node* standardizeFuncForm(Node*);
+Node* standardizeAnd(Node*);
+Node* standardizeAt(Node*);
+Node* standardizeRec(Node*);
+Node* newNode(string, int);
+
+//CSE MACHINE 
+
+void preOrder(Node*);
+void printQueue();
+void buildControl (Node*);
+void createControlStructure (Node*, queue<cseNode*>, int, Node*[]);
+int countLambda (Node*); 
 
 #endif

@@ -1,4 +1,4 @@
 all:
 	g++ parser.cpp -o p1 -std=c++11
-cl:
+clean:
 	rm -f *.o p1

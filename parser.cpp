@@ -1,5 +1,7 @@
 #include "header.h"
 #include "scanner.cpp"
+#include "standardizer.cpp"
+#include "cse-machine.cpp"
 
 ifstream in_stream;
 stack<Node*> s;
@@ -432,7 +434,6 @@ void display_tree(Node *node, int level){
 }
 
 int main (int argc, char** argv){
-
 	bool ast = false;
 	string file;
 
@@ -448,6 +449,10 @@ int main (int argc, char** argv){
 	}
 
 	E();
+	standardize(s.top());
+	preOrder(s.top());
+	// printQueue();
+	
 	if (ast) {
 		display_tree(s.top(), 0);
 	}
