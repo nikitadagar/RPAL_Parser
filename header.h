@@ -93,8 +93,9 @@ Node* newNode(string, int);
 
 void preOrder(Node*);
 void printQueue();
+void printQueue(queue<cseNode>);
 void buildControl (Node*);
-void createControlStructure (Node*, queue<cseNode*>, int, Node*[]);
+void createControlStructure (Node*, queue<cseNode*>&, int&, Node*[]);
 int countLambda (Node*); 
 
 #endif

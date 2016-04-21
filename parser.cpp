@@ -450,7 +450,8 @@ int main (int argc, char** argv){
 
 	E();
 	standardize(s.top());
-	preOrder(s.top());
+	// preOrder(s.top());
+	buildControl(s.top());
 	// printQueue();
 	
 	if (ast) {
