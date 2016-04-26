@@ -6,6 +6,8 @@
 #include <unordered_set>
 #include <stack>
 #include <queue>
+#include <unordered_map>
+#include <string>
 
 using namespace std;
 
@@ -18,6 +20,7 @@ typedef struct nodeType{
 
 typedef struct cseNode {
 	string name;
+	string type;
 	int i;	//subscript
 	string x;	//superscript
 	int k;	//pre-superscript
@@ -94,8 +97,16 @@ Node* newNode(string, int);
 void preOrder(Node*);
 void printQueue();
 void printQueue(queue<cseNode>);
-void buildControl (Node*);
+void buildControls (Node*, queue<cseNode*>*[]);
 void createControlStructure (Node*, queue<cseNode*>&, int&, Node*[]);
 int countLambda (Node*); 
+cseNode* newCSENode (string, string);
+cseNode* createNextEnv (unordered_map<string, string>* envs[]);
+void load_control (int, stack<cseNode*>&, queue<cseNode*>*[]);
+void printControlStack(stack<cseNode*>);
 
 #endif
+
+
+
+
