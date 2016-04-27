@@ -22,9 +22,10 @@ void run_machine (Node* root) {
 	s_stack.push(en);
 	load_control(0, c_control, deltas);
 
+	printDeltas (lambdas, deltas);
 	start_machine(envs, c_control, s_stack, deltas);
 
-	printDeltas (lambdas, deltas);
+	
 	//printControlStack(c_control);
 }
 
@@ -82,6 +83,23 @@ void createControlStructure (Node* root, queue<cseNode*> &qu, int &count, Node* 
 		createControlStructure(root->child[0], qu, count, subtrees);
 	}
 
+	else if (root->name == "tau") {
+		
+		n->name = "tau";		//add the tau node to the current control structure
+		n->i = root->children;
+		qu.push(n);
+
+		//add each of tau's children to the subtree node
+		for (int i = 0; i < root->children; i++) {
+			subtrees[++count] = root->child[i];
+			cseNode* del = new cseNode;
+			del->name = "delta";
+			del->type = "delta";
+			del->i = count;
+			qu.push(del);
+		}
+	}
+
 	else {
 		n->name = root->name;
 		qu.push(n);
@@ -103,7 +121,7 @@ int countLambda (Node* root) {
 			count = count+2;
 		}
 		else if (q.front()->name == "tau") {
-			count++;
+			count = count+root->children;
 		}
 		q.pop();
 	}

@@ -8,6 +8,10 @@
 #include <queue>
 #include <unordered_map>
 #include <string>
+#include <sstream>
+#include <vector>
+#include <regex>
+#include <cmath>
 
 using namespace std;
 
@@ -117,6 +121,8 @@ cseNode* bi_operation (string, string, string);
 int extractInt (string);
 string extractID (string);
 cseNode* un_operation (string, string); 
+string augToTuple (string tuple, string val);
+
 #endif
 
 

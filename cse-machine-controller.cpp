@@ -73,6 +73,33 @@ void start_machine (unordered_map<string, cseNode>* envs[], stack<cseNode*> c_co
 			load_control (lambda->i, c_control, deltas);
 		}
 
+		else if (temp->name == "gamma" && s_stack.top()->type == "tuple") {
+
+			c_control.pop();	//pop the gamma
+			string tuple = s_stack.top()->name;	//get the tuple
+			s_stack.pop();		//pop tuple from stack
+
+			tuple = tuple.substr(1, tuple.length()-2);	//remove brackets from tuple
+			//split on , and add to vector
+			stringstream ss(tuple);
+			vector<string> result;
+			while (ss.good()) {
+				string substr;
+			    getline( ss, substr, ',' );
+			    substr = std::regex_replace(substr, std::regex("^ +"), "");
+			    result.push_back( substr );
+			}
+
+			string num = s_stack.top()->name;
+			s_stack.pop(); 		//remove the number
+			int index = extractInt(num);
+			
+			string fetched_value = result[index-1];		//rpal indices start from 1
+
+			cseNode* result_node = newCSENode(fetched_value, "");
+			s_stack.push(result_node);
+		}
+
 		//if a variable is popped
 		else if (isID (temp->name)) {
 			
@@ -141,10 +168,46 @@ void start_machine (unordered_map<string, cseNode>* envs[], stack<cseNode*> c_co
 
 		}
 
+		//if next node is a delta (TAU's child node type)
+		//we just load the control structure onto the control
+		else if (temp->name == "delta" && temp->type == "delta") {
+			int deltaIndex = temp->i;
+			c_control.pop();
+			load_control(deltaIndex, c_control, deltas);
+		}
+
+		else if (temp->name == "tau") {
+			
+			int tauSize = temp->i;
+			string tuple = "()";	//create empty tuple;
+			
+			for (int i=0; i < tauSize; i ++) {		//aug to tuple n nodes popped from stack
+				tuple = augToTuple(tuple, s_stack.top()->name);
+				s_stack.pop();
+			}
+
+			cseNode* tup = new cseNode;	//add the tuple to the stack
+			tup->name = tuple;
+			tup->type = "tuple";
+			tup->i = tauSize;
+			s_stack.push(tup);
+
+			c_control.pop(); 	//pop the tau from control
+		}
 
 		cout << "Control : \n";  printStack(c_control);
 		cout << "Stack : \n";    printStack(s_stack);
-		z++;	//remove z after testing
+	}
+}
+
+string augToTuple (string tuple, string val) {
+
+	if (tuple == "()" ) {		//if empty tuple
+		return "(" + val + ")";
+	}
+	else {
+		// return "(" + val + ", " + tuple.substr(1);
+		return tuple.substr(0, tuple.length()-1) + ", " + val + ")";
 	}
 }
 
@@ -186,17 +249,102 @@ cseNode* bi_operation (string op, string rand1, string rand2) {	//TODO: complete
 		n->name = "<INT:" + n->name + ">";
 		return n;
 	}
-	else if (op == "eq") {
+	else if (op == "-") {
+		int result = extractInt(rand1) - extractInt(rand2);
+		cseNode *n = newCSENode (to_string(result), "int");
+		n->name = "<INT:" + n->name + ">";
+		return n;
+	}
+	else if (op == "*") {
+		int result = extractInt(rand1) * extractInt(rand2);
+		cseNode *n = newCSENode (to_string(result), "int");
+		n->name = "<INT:" + n->name + ">";
+		return n;
+	}
+	else if (op == "/") {
+		int result = extractInt(rand1) / extractInt(rand2);
+		cseNode *n = newCSENode (to_string(result), "int");
+		n->name = "<INT:" + n->name + ">";
+		return n;
+	}
+	else if (op == "**") {
+		int result = pow(extractInt(rand1), extractInt(rand2));
+		cseNode *n = newCSENode (to_string(result), "int");
+		n->name = "<INT:" + n->name + ">";
+		return n;
+	}
+	else if (op == "<" || op == "ls") {
 		cseNode *n;
-		if (extractInt(rand1) == extractInt(rand2)) {
+		if (extractInt(rand1) < extractInt(rand2)) {
 			n = newCSENode ("<true>", "bool");
-		}
-		else {
+		} else {
 			n = newCSENode ("<false>", "bool");
 		}
 		return n;
 	}
-
+	else if (op == "<=" || op == "le") {
+		cseNode *n;
+		if (extractInt(rand1) <= extractInt(rand2)) {
+			n = newCSENode ("<true>", "bool");
+		} else {
+			n = newCSENode ("<false>", "bool");
+		}
+		return n;
+	}
+	else if (op == ">" || op == "gr") {
+		cseNode *n;
+		if (extractInt(rand1) > extractInt(rand2)) {
+			n = newCSENode ("<true>", "bool");
+		} else {
+			n = newCSENode ("<false>", "bool");
+		}
+		return n;
+	}
+	else if (op == ">=" || op == "ge") {
+		cseNode *n;
+		if (extractInt(rand1) >= extractInt(rand2)) {
+			n = newCSENode ("<true>", "bool");
+		} else {
+			n = newCSENode ("<false>", "bool");
+		}
+		return n;
+	}
+	else if (op == "ne") {
+		cseNode *n;
+		if (extractInt(rand1) == extractInt(rand2)) {
+			n = newCSENode ("<false>", "bool");
+		} else {
+			n = newCSENode ("<true>", "bool");
+		}
+		return n;
+	}
+	else if (op == "eq") {
+		cseNode *n;
+		if (extractInt(rand1) == extractInt(rand2)) {
+			n = newCSENode ("<true>", "bool");
+		} else {
+			n = newCSENode ("<false>", "bool");
+		}
+		return n;
+	}
+	else if (op == "and") {
+		cseNode *n;
+		if (rand1 == "<true>" && rand2 == "<true>") {
+			n = newCSENode ("<true>", "bool");
+		} else {
+			n = newCSENode ("<false>", "bool");
+		}
+		return n;
+	}
+	else if (op == "or") {
+		cseNode *n;
+		if (rand1 == "<false>" && rand2 == "<false>") {
+			n = newCSENode ("<false>", "bool");
+		} else {
+			n = newCSENode ("<true>", "bool");
+		}
+		return n;
+	}
 	return NULL;
 }
 
