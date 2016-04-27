@@ -393,13 +393,14 @@ cseNode* un_operation (string op, string rand1) {
 
 void myPrint (string name) {
 	if (isInt(name)) {
-		cout << extractInt(name);
+		cout << extractInt(name) << "\n";
 	}
 	else if (isID(name)) {
-		cout << extractID(name);
+		cout << extractID(name) << "\n";
 	}
 	else if (isStr(name)) {
-		cout << extractStr(name);
+		cout << extractStr(name) << "\n";
+		cout << "Hello\tWorld.\nHai";
 	}
 }
 
