@@ -98,7 +98,7 @@ void start_machine (unordered_map<string, cseNode>* envs[], stack<cseNode*> c_co
 			while (ss.good()) {
 				string substr;
 			    getline( ss, substr, ',' );
-			    substr = std::regex_replace(substr, std::regex("^ +"), "");
+			    substr.erase(substr.begin(), std::find_if(substr.begin(), substr.end(), std::bind1st(std::not_equal_to<char>(), ' ')));
 			    result.push_back( substr );
 			}
 

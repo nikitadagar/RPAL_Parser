@@ -10,7 +10,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
-#include <regex>
+#include <algorithm>
 #include <cmath>
 
 using namespace std;
