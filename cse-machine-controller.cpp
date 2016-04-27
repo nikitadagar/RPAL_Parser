@@ -1,23 +1,29 @@
 #include "header.h"
 
-string const bi_operators[] = {"+", "-", "*", "/", "<", ">", "<=", ">=", "or", "and", "eq", "gr", "ge", "ls", "le", "ne", "aug", "|"};
+string const bi_operators[] = {"**", "+", "-", "*", "/", "<", ">", "<=", ">=", "or", "and", "eq", "gr", "ge", "ls", "le", "ne", "aug", "|"};
 unordered_set<string> bi_ops(bi_operators, bi_operators + sizeof(bi_operators) / sizeof(bi_operators[0]));
 
-string const un_operators[] = {"not", "**", "neg", "!"};
+string const un_operators[] = {"not", "neg"};
 unordered_set<string> un_ops(un_operators, un_operators + sizeof(un_operators) / sizeof(un_operators[0]));
 
 void start_machine (unordered_map<string, cseNode>* envs[], stack<cseNode*> c_control, stack<cseNode*> s_stack, queue<cseNode*>* deltas[]) {
 	cseNode* temp;
-	int z=1;
 
-	while (!c_control.empty() && z<10) {
+	while (!c_control.empty()) {
 
-		cout << "\n ------Iteration " << z <<"-------\n";
+		cout << "\n ------Iteration -------\n";
 		
 		temp = c_control.top();
 
 		//if INT, add it to the stack as it is
 		if (isInt(temp->name)) {
+			s_stack.push(temp);
+			c_control.pop();
+		}
+
+		//if boolean, simply transfer to stack
+		else if (temp->name == "<true>" || temp->name == "<false>") {
+			temp->type = "bool";
 			s_stack.push(temp);
 			c_control.pop();
 		}
@@ -28,18 +34,24 @@ void start_machine (unordered_map<string, cseNode>* envs[], stack<cseNode*> c_co
 			s_stack.push(temp);
 			c_control.pop();
 		}
-		//if its a binary operator
+		//if its a BINARY operator
 		else if (bi_ops.count(temp->name)) {
 			
 			string rand1 = s_stack.top()->name; s_stack.pop();	//get rand1
 			string rand2 = s_stack.top()->name;	s_stack.pop();	//get rand2
 
 			cseNode *n = bi_operation(temp->name, rand1, rand2);
-			n->name = "<INT:" + n->name + ">";
-
 			s_stack.push(n);
 
 			c_control.pop();	//pop the operator
+		}
+
+		//is a UNARY operator
+		else if (un_ops.count(temp->name)) {
+			string rand1 = s_stack.top()->name; s_stack.pop();	//get operand from stack
+			cseNode *n = un_operation (temp->name, rand1);
+			s_stack.push(n);
+			c_control.pop();
 		}
 
 		//if gamma and lambda pair
@@ -95,6 +107,39 @@ void start_machine (unordered_map<string, cseNode>* envs[], stack<cseNode*> c_co
 			s_stack.push(cn);	//put back cn
 		}
 
+		else if (temp->name == "beta") {
+
+			c_control.pop();	//pop off beta from control
+			
+			int deltaIndex; 	//to get the subscript of the delta node
+
+			string b = s_stack.top()->name;
+			
+			if (b == "<false>") {
+				
+				cseNode* del = c_control.top();
+
+				if (del->type == "false") {
+					deltaIndex = del->i;
+					c_control.pop();
+					c_control.pop();
+					s_stack.pop();
+					load_control(deltaIndex, c_control, deltas);
+				}
+				else {
+					cout << "ERROR : Expecting a false delta ttype in conditional operator";
+				}
+			}
+			else if (b == "<true>") {
+				c_control.pop();
+				cseNode* del = c_control.top();
+				deltaIndex = del->i;
+				c_control.pop();
+				s_stack.pop();
+				load_control(deltaIndex, c_control, deltas);
+			}
+
+		}
 
 
 		cout << "Control : \n";  printStack(c_control);
@@ -132,14 +177,48 @@ int extractInt (string name) {		//extracts x out of node of form <INT:x>
 	}
 }
 
-cseNode* bi_operation (string op, string rand1, string rand2) {
+cseNode* bi_operation (string op, string rand1, string rand2) {	//TODO: complete
 	//rand1 op rand2
+
 	if (op == "+") {
 		int result = extractInt(rand1) + extractInt(rand2);
-		cseNode *n = newCSENode (to_string(result), "INT");
+		cseNode *n = newCSENode (to_string(result), "int");
+		n->name = "<INT:" + n->name + ">";
 		return n;
 	}
+	else if (op == "eq") {
+		cseNode *n;
+		if (extractInt(rand1) == extractInt(rand2)) {
+			n = newCSENode ("<true>", "bool");
+		}
+		else {
+			n = newCSENode ("<false>", "bool");
+		}
+		return n;
+	}
+
 	return NULL;
+}
+
+cseNode* un_operation (string op, string rand1) {
+
+	if (op == "neg") {
+		int rand2 = extractInt(rand1);
+		rand2 = -rand2;
+		return newCSENode ("<INT:" + to_string(rand2) + ">", "int");
+	}
+	else if (op == "not") {
+		if (rand1 == "<true>") {
+			return newCSENode ("<false>", "bool");
+		}
+		else {
+			return newCSENode ("<true>", "bool");
+		}
+	}
+	else {
+		cout << "ERROR : unary operation not valid";
+		return NULL;
+	}
 }
 
 

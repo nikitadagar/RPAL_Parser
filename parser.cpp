@@ -436,12 +436,16 @@ void display_tree(Node *node, int level){
 
 int main (int argc, char** argv){
 	bool ast = false;
+	bool st = false;
 	string file;
 
 	for(int i = 1; i < argc; i++) {
 		
 		if(string(argv[i]) == "-ast") {
 			ast = true;
+		}
+		else if (string(argv[i]) == "-st") {
+			st = true;
 		}
 		else if(argv[i][0] != '-') {
 			file = string(argv[i]);
@@ -450,14 +454,20 @@ int main (int argc, char** argv){
 	}
 
 	E();
-	standardize(s.top());
-	// preOrder(s.top());
-	run_machine(s.top());
+	
 	// printQueue();
 	
 	if (ast) {
 		display_tree(s.top(), 0);
 	}
+	
+	standardize(s.top());
+	
+	if (st) {
+		display_tree(s.top(), 0);
+	}
+
+	run_machine(s.top());
 
   	in_stream.close();
   }

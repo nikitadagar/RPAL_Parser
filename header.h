@@ -116,6 +116,7 @@ bool isID (string);
 cseNode* bi_operation (string, string, string);
 int extractInt (string);
 string extractID (string);
+cseNode* un_operation (string, string); 
 #endif
 
 

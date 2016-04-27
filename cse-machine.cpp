@@ -15,25 +15,16 @@ void run_machine (Node* root) {
 
 	unordered_map<string, cseNode>* envs[lambdas+1];	//array of pointers to maps of environments
 
-	//initializing the control and stack 
-	//adding e0 to both
+	// initializing the control and stack 
+	// adding e0 to both
 	cseNode* en = createNextEnv(envs);
 	c_control.push(en);
 	s_stack.push(en);
 	load_control(0, c_control, deltas);
 
-
-	// -------- testing environments ------------
-	// unordered_map<string, string> *e0 = envs[0];	//get the first env
-	// (*e0)["Nikita"] = "pudgu";
-	// (*e0)["Alok"] = "baby";
-	// cseNode* n2 = createNextEnv(envs);
-	// c_control.push(en);
-	// s_stack.push(en);
-	// printMap(*envs[1]);
-
 	start_machine(envs, c_control, s_stack, deltas);
-	// printDeltas (lambdas, deltas);
+
+	printDeltas (lambdas, deltas);
 	//printControlStack(c_control);
 }
 
@@ -54,7 +45,7 @@ void buildControls (Node* root, queue<cseNode*>* deltas[]) {
 
 //root is either the root of the whole tree or lambda
 //funtion creates a control structure starting at the given node
-void createControlStructure (Node* root, queue<cseNode*> &q, int &count, Node* subtrees[]) {
+void createControlStructure (Node* root, queue<cseNode*> &qu, int &count, Node* subtrees[]) {
 
 	cseNode* n = new cseNode;
 
@@ -64,18 +55,38 @@ void createControlStructure (Node* root, queue<cseNode*> &q, int &count, Node* s
 		n->i = ++count;
 		n->x = root->child[0]->name;
 
-		q.push(n);
+		qu.push(n);
 
 		subtrees[count] = root->child[1];
 		// return;
 	}
+	else if (root->name == "->") {
+
+		subtrees[++count] = root->child[1];
+		cseNode* del1 = new cseNode;	//push delta node for true
+		del1->name = "delta";
+		del1->type = "true";
+		del1->i = count;
+		qu.push(del1);
+
+		subtrees[++count] = root->child[2];	//add to subtree array to generate control structures
+		cseNode* del2 = new cseNode;	//push delta node for flase
+		del2->name = "delta";
+		del2->type = "false";
+		del2->i = count;
+		qu.push(del2);
+
+		n->name = "beta";			//push the beta node
+		qu.push(n);
+
+		createControlStructure(root->child[0], qu, count, subtrees);
+	}
+
 	else {
 		n->name = root->name;
-		q.push(n);
-		
-		if(root->children > 0) {
-			createControlStructure(root->child[0], q, count, subtrees);
-			createControlStructure(root->child[1], q, count, subtrees);
+		qu.push(n);
+		for(int i = 0; i < root->children; i++) {
+			createControlStructure(root->child[i], qu, count, subtrees);
 		}
 	}
 }
@@ -88,6 +99,12 @@ int countLambda (Node* root) {
 		if (q.front()->name == "lambda") {
 			count++;
 		}
+		else if (q.front()->name == "->") {
+			count = count+2;
+		}
+		else if (q.front()->name == "tau") {
+			count++;
+		}
 		q.pop();
 	}
 	return count;
@@ -98,9 +115,8 @@ void preOrder(Node* root) {
 
 	q.push(root);
 	
-	if (root->children > 0){
-		preOrder(root->child[0]);
-		preOrder(root->child[1]);
+	for(int i = 0; i < root->children; i++) {
+		preOrder(root->child[i]);
 	}
 }
 
@@ -113,10 +129,10 @@ void printQueue () {
 }
 
 //prints the queue at the provided root
-void printQueue (queue<cseNode*> q) {
-	while (!q.empty()) {
-		cout << q.front()->name << "\n";
-		q.pop();
+void printQueue (queue<cseNode*> qu) {
+	while (!qu.empty()) {
+		cout << qu.front()->name << "\n";
+		qu.pop();
 	}
 }
 
@@ -179,11 +195,11 @@ void printDeltas (int lambdas, queue<cseNode*>* deltas[]) {
 
 	cout << "printing deltas : \n";
 	for(int j = 0; j < lambdas + 1; j++) {
-		queue<cseNode*> q = *deltas[j];
+		queue<cseNode*> qu = *deltas[j];
 		cout << "D" << j << ":\n";
-		while(!q.empty()) {
-			cout << q.front()->name << "\n";
-			q.pop();
+		while(!qu.empty()) {
+			cout << qu.front()->name << "\n";
+			qu.pop();
 		}
 		cout << "\n";
 	}
