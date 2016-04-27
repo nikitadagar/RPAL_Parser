@@ -117,6 +117,8 @@ void printDeltas (int, queue<cseNode*>*[]);
 void start_machine (unordered_map<string, cseNode>*[], stack<cseNode*>, stack<cseNode*>, queue<cseNode*>*[]);
 bool isInt(string);
 bool isID (string);
+bool isStr (string);
+string extractStr (string);
 cseNode* bi_operation (string, string, string);
 int extractInt (string);
 string extractID (string);

@@ -16,7 +16,7 @@ void start_machine (unordered_map<string, cseNode>* envs[], stack<cseNode*> c_co
 		temp = c_control.top();
 
 		//if INT, add it to the stack as it is
-		if (isInt(temp->name) || temp->type == "func") {
+		if (isInt(temp->name) || temp->type == "func" || isStr(temp->name)) {
 			s_stack.push(temp);
 			c_control.pop();
 		}
@@ -233,6 +233,10 @@ bool isID (string name) {
 	return name.find("<ID:") != std::string::npos;
 }
 
+bool isStr (string name) {
+	return name.find("<STR:") != std::string::npos;
+}
+
 string extractID (string name) {
 	if (isID(name)) {
 		return name.substr(4, name.length()-5);
@@ -253,6 +257,10 @@ int extractInt (string name) {		//extracts x out of node of form <INT:x>
 		return 0;
 	}
 }
+
+string extractStr (string name) {
+	return name.substr(6, name.length()-8);
+} 
 
 cseNode* bi_operation (string op, string rand1, string rand2) {	//TODO: complete
 	//rand1 op rand2
@@ -387,8 +395,11 @@ void myPrint (string name) {
 	if (isInt(name)) {
 		cout << extractInt(name);
 	}
-	else (isID(name)) {
+	else if (isID(name)) {
 		cout << extractID(name);
+	}
+	else if (isStr(name)) {
+		cout << extractStr(name);
 	}
 }
 
