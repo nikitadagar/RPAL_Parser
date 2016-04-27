@@ -387,6 +387,9 @@ void myPrint (string name) {
 	if (isInt(name)) {
 		cout << extractInt(name);
 	}
+	else (isID(name)) {
+		cout << extractID(name);
+	}
 }
 
 
