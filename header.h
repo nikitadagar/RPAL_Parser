@@ -27,7 +27,9 @@ typedef struct cseNode {
 } cseNode;
 
 extern ifstream in_stream;
-queue<Node*> q;
+queue<Node*> q;		//queue which has the preorder of the whole standardized AST
+extern stack<int> current_env;
+extern int env_count;
 
 //Building and displaying AST funcitons
 void display_tree(Node*, int);
@@ -101,10 +103,19 @@ void buildControls (Node*, queue<cseNode*>*[]);
 void createControlStructure (Node*, queue<cseNode*>&, int&, Node*[]);
 int countLambda (Node*); 
 cseNode* newCSENode (string, string);
-cseNode* createNextEnv (unordered_map<string, string>* envs[]);
+cseNode* createNextEnv (unordered_map<string, cseNode>*[]);
 void load_control (int, stack<cseNode*>&, queue<cseNode*>*[]);
-void printControlStack(stack<cseNode*>);
+void printStack(stack<cseNode*>);
+void printMap (unordered_map<string, string>);
+void printDeltas (int, queue<cseNode*>*[]);
 
+//CSE MACHINE CONTROLLER 
+void start_machine (unordered_map<string, cseNode>*[], stack<cseNode*>, stack<cseNode*>, queue<cseNode*>*[]);
+bool isInt(string);
+bool isID (string);
+cseNode* bi_operation (string, string, string);
+int extractInt (string);
+string extractID (string);
 #endif
 
 

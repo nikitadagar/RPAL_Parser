@@ -1,7 +1,7 @@
 #include "header.h"
 
 int env_count = 0;
-
+stack<int> current_env;
 
 void run_machine (Node* root) {
 
@@ -13,15 +13,28 @@ void run_machine (Node* root) {
 	queue<cseNode*>* deltas[lambdas+1];		//create an array of queues for the deltas
 	buildControls(root, deltas);			// populate the control structures
 
-	unordered_map<string, string>* envs[lambdas+1];	//array of pointers to maps of environments
+	unordered_map<string, cseNode>* envs[lambdas+1];	//array of pointers to maps of environments
 
+	//initializing the control and stack 
+	//adding e0 to both
 	cseNode* en = createNextEnv(envs);
 	c_control.push(en);
+	s_stack.push(en);
+	load_control(0, c_control, deltas);
 
-	load_control(1, c_control, deltas);
-	printControlStack(c_control);
 
+	// -------- testing environments ------------
+	// unordered_map<string, string> *e0 = envs[0];	//get the first env
+	// (*e0)["Nikita"] = "pudgu";
+	// (*e0)["Alok"] = "baby";
+	// cseNode* n2 = createNextEnv(envs);
+	// c_control.push(en);
+	// s_stack.push(en);
+	// printMap(*envs[1]);
 
+	start_machine(envs, c_control, s_stack, deltas);
+	// printDeltas (lambdas, deltas);
+	//printControlStack(c_control);
 }
 
 //populates the array of all the control structures (deltas)
@@ -36,16 +49,6 @@ void buildControls (Node* root, queue<cseNode*>* deltas[]) {
 	for (int i = 0; i <= lambdas; i++) {
 		deltas[i] = new queue<cseNode*>; 
 		createControlStructure(subtreeRoots[i], *deltas[i], count, subtreeRoots);
-	}
-
-	for(int j = 0; j < lambdas + 1; j++) {
-		queue<cseNode*> q = *deltas[j];
-		cout << "D" << j << ":\n";
-		while(!q.empty()) {
-			cout << q.front()->name << "\n";
-			q.pop();
-		}
-		cout << "\n";
 	}
 }
 
@@ -125,16 +128,26 @@ cseNode* newCSENode (string name, string type) {
 }
 
 //create next environment
-cseNode* createNextEnv (unordered_map<string, string>* envs[]) {
+cseNode* createNextEnv (unordered_map<string, cseNode>* envs[]) {
 
-	cseNode* env = newCSENode ("e" + to_string(env_count),"env");
-	envs[env_count] = new unordered_map<string, string>;
+	cseNode* env = newCSENode ("e" + to_string(env_count),"env");	//new CSE Node of type env
+	envs[env_count] = new unordered_map<string, cseNode>;	//add empty env map to array of envs
+
+	if (!current_env.empty()){		//for all non primitive envs
+		
+		int parentEnvInd = current_env.top();
+		unordered_map<string,cseNode> parentEnv = *envs[parentEnvInd];
+		unordered_map<string,cseNode> *currentEnv = envs[env_count];
+		(*currentEnv).insert(parentEnv.begin(), parentEnv.end()); //copy parent environment 
+
+	}
+
+	current_env.push(env_count);	//stack to keep track of current environment
 	env_count++;
 	return env;
 }
 
 void load_control (int d, stack<cseNode*> &c_control, queue<cseNode*>* deltas[]) {
-	
 	queue<cseNode*> del = *deltas[d];
 	while (!del.empty()) {
 		c_control.push(del.front());
@@ -143,9 +156,8 @@ void load_control (int d, stack<cseNode*> &c_control, queue<cseNode*>* deltas[])
 }
 //helper function to print stack
 //can be deleted after completion
-void printControlStack(stack<cseNode*> controlStack) {
+void printStack(stack<cseNode*> controlStack) {
 	cseNode* node;
-	cout << "\ncontrol stack:" << "\n"; 
 	while(!controlStack.empty()) {
 		node = controlStack.top();
 		cout << node->name << " ";
@@ -154,7 +166,28 @@ void printControlStack(stack<cseNode*> controlStack) {
 	cout << "\n\n";
 }
 
+//helper funciton to print environments
+void printMap (unordered_map<string, string> e0) {
+	typedef unordered_map<string, string>::iterator iter;
+	for(iter iterator = e0.begin(); iterator != e0.end(); iterator++) {
+    	cout<< "\nKey : " << iterator->first << " value : " << iterator->second << "\n"; 
+	}
 
+}
+
+void printDeltas (int lambdas, queue<cseNode*>* deltas[]) {
+
+	cout << "printing deltas : \n";
+	for(int j = 0; j < lambdas + 1; j++) {
+		queue<cseNode*> q = *deltas[j];
+		cout << "D" << j << ":\n";
+		while(!q.empty()) {
+			cout << q.front()->name << "\n";
+			q.pop();
+		}
+		cout << "\n";
+	}
+}
 
 
 

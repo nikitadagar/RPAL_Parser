@@ -2,6 +2,7 @@
 #include "scanner.cpp"
 #include "standardizer.cpp"
 #include "cse-machine.cpp"
+#include "cse-machine-controller.cpp"
 
 ifstream in_stream;
 stack<Node*> s;
