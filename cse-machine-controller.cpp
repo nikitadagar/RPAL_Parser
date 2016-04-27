@@ -64,12 +64,45 @@ void start_machine (unordered_map<string, cseNode>* envs[], stack<cseNode*> c_co
 			c_control.push(newEnv);	//add env to control and stack
 			s_stack.push(newEnv);
 
-			//update current environment
-			string id_ = extractID(lambda->x);
-			unordered_map<string, cseNode> *currentEnv = envs[env_count-1];
-			(*currentEnv)[id_] = *value_node;
+			// -- update current env -----
+			unordered_map<string, cseNode> *currentEnv = envs[env_count-1]; 	//get current env
 
-			//load delta onto the control
+			//update current environment
+			if ( value_node->type == "tuple") {
+				
+				string tup = value_node->name;  //get the VALUE tuple
+				tup = tup.substr(1, tup.length()-2);
+
+				stringstream ss(tup);		//split the tuple on comma
+				vector<string> split_tuple;
+				while (ss.good()) {
+					string substr;
+			    	getline( ss, substr, ',' );
+			    	split_tuple.push_back( substr );
+				}
+
+				string x_array = lambda->x;	//get KEY array 
+
+				stringstream ss1(x_array);		//split the tuple on comma
+				vector<string> x_tuple;
+				while (ss1.good()) {
+					string substr2;
+			    	getline( ss1, substr2, ',' );
+			    	x_tuple.push_back( substr2 );
+				}
+
+				for (int i=0; i < x_tuple.size(); i++) {
+					string value1 = split_tuple[i];
+					value1.erase(value1.begin(), std::find_if(value1.begin(), value1.end(), std::bind1st(std::not_equal_to<char>(), ' '))); //remove trailing spaces
+					(*currentEnv)[extractID(x_tuple[i])] = *newCSENode(value1, "");	//add to env, each pair
+				}
+			}
+			else {
+				string id_ = extractID(lambda->x);
+				(*currentEnv)[id_] = *value_node;
+			}
+
+			//---load delta onto the control
 			load_control (lambda->i, c_control, deltas);
 		}
 
@@ -260,6 +293,7 @@ int extractInt (string name) {		//extracts x out of node of form <INT:x>
 
 string extractStr (string name) {
 	return name.substr(6, name.length()-8);
+	//TODO : take care of \t and \n
 } 
 
 cseNode* bi_operation (string op, string rand1, string rand2) {	//TODO: complete

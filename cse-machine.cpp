@@ -54,12 +54,28 @@ void createControlStructure (Node* root, queue<cseNode*> &qu, int &count, Node* 
 		//create new lambda node
 		n->name = "lambda";
 		n->i = ++count;
-		n->x = root->child[0]->name;
+		
+		if (root->child[0]->name == ",") {
+			//create the array superscript of lambda of the form x,y
+			string temp = "";
+			for (int i=0; i < root->child[0]->children; i++) {
+				if (temp == "") {
+					temp = temp + root->child[0]->child[i]->name;
+				}
+				else {
+					temp = temp + "," + root->child[0]->child[i]->name;
+				}
+			}
+
+			n->x = temp;
+		}
+		else {
+			n->x = root->child[0]->name;
+		}
 
 		qu.push(n);
 
 		subtrees[count] = root->child[1];
-		// return;
 	}
 	else if (root->name == "->") {
 
