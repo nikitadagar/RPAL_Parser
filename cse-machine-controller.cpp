@@ -16,7 +16,7 @@ void start_machine (unordered_map<string, cseNode>* envs[], stack<cseNode*> c_co
 		temp = c_control.top();
 
 		//if INT, add it to the stack as it is
-		if (isInt(temp->name)) {
+		if (isInt(temp->name) || temp->type == "func") {
 			s_stack.push(temp);
 			c_control.pop();
 		}
@@ -71,6 +71,14 @@ void start_machine (unordered_map<string, cseNode>* envs[], stack<cseNode*> c_co
 
 			//load delta onto the control
 			load_control (lambda->i, c_control, deltas);
+		}
+
+		//If gamma and Print
+		else if (temp->name == "gamma" && s_stack.top()->name == "<ID:Print>") {
+			c_control.pop();	//pop th gamma
+			s_stack.pop();	//pop the print node
+			string str = s_stack.top()->name;
+			cout << "\n" << str;
 		}
 
 		else if (temp->name == "gamma" && s_stack.top()->type == "tuple") {
@@ -194,7 +202,9 @@ void start_machine (unordered_map<string, cseNode>* envs[], stack<cseNode*> c_co
 
 			c_control.pop(); 	//pop the tau from control
 		}
-
+		else {
+			c_control.pop();
+		}
 		cout << "Control : \n";  printStack(c_control);
 		cout << "Stack : \n";    printStack(s_stack);
 	}

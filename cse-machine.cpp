@@ -102,6 +102,9 @@ void createControlStructure (Node* root, queue<cseNode*> &qu, int &count, Node* 
 
 	else {
 		n->name = root->name;
+		if (root->name == "<ID:Print>") {
+			n->type = "func";
+		}
 		qu.push(n);
 		for(int i = 0; i < root->children; i++) {
 			createControlStructure(root->child[i], qu, count, subtrees);
