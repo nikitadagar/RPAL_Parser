@@ -22,7 +22,7 @@ void run_machine (Node* root) {
 	s_stack.push(en);
 	load_control(0, c_control, deltas);
 
-	printDeltas (lambdas, deltas);
+	// printDeltas (lambdas, deltas);
 	start_machine(envs, c_control, s_stack, deltas);
 
 	

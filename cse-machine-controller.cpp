@@ -11,7 +11,7 @@ void start_machine (unordered_map<string, cseNode>* envs[], stack<cseNode*> c_co
 
 	while (!c_control.empty()) {
 
-		cout << "\n ------Iteration -------\n";
+		// cout << "\n ------Iteration -------\n";
 		
 		temp = c_control.top();
 
@@ -78,7 +78,11 @@ void start_machine (unordered_map<string, cseNode>* envs[], stack<cseNode*> c_co
 			c_control.pop();	//pop th gamma
 			s_stack.pop();	//pop the print node
 			string str = s_stack.top()->name;
-			cout << "\n" << str;
+			myPrint(str);
+
+			cseNode* dummy = newCSENode ("<dummy>", "dummy");
+			s_stack.pop();	//pop the node to be printed
+			s_stack.push(dummy);
 		}
 
 		else if (temp->name == "gamma" && s_stack.top()->type == "tuple") {
@@ -205,8 +209,8 @@ void start_machine (unordered_map<string, cseNode>* envs[], stack<cseNode*> c_co
 		else {
 			c_control.pop();
 		}
-		cout << "Control : \n";  printStack(c_control);
-		cout << "Stack : \n";    printStack(s_stack);
+		// cout << "Control : \n";  printStack(c_control);
+		// cout << "Stack : \n";    printStack(s_stack);
 	}
 }
 
@@ -376,6 +380,12 @@ cseNode* un_operation (string op, string rand1) {
 	else {
 		cout << "ERROR : unary operation not valid";
 		return NULL;
+	}
+}
+
+void myPrint (string name) {
+	if (isInt(name)) {
+		cout << extractInt(name);
 	}
 }
 
