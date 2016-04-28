@@ -7,7 +7,9 @@ string const un_operators[] = {"not", "neg"};
 unordered_set<string> un_ops(un_operators, un_operators + sizeof(un_operators) / sizeof(un_operators[0]));
 
 void start_machine (unordered_map<string, cseNode>* envs[], stack<cseNode*> c_control, stack<cseNode*> s_stack, queue<cseNode*>* deltas[]) {
+	
 	cseNode* temp;
+	cseNode* lambdas[50];	//store lambdas popped of the stack to be recalled later during rec
 
 	while (!c_control.empty()) {
 
@@ -16,7 +18,7 @@ void start_machine (unordered_map<string, cseNode>* envs[], stack<cseNode*> c_co
 		temp = c_control.top();
 
 		//if INT, add it to the stack as it is
-		if (isInt(temp->name) || temp->type == "func" || isStr(temp->name)) {
+		if (isInt(temp->name) || temp->type == "func" || isStr(temp->name) || temp->name == "<Y*>") {
 			s_stack.push(temp);
 			c_control.pop();
 		}
@@ -181,6 +183,23 @@ void start_machine (unordered_map<string, cseNode>* envs[], stack<cseNode*> c_co
 
 			cseNode* result_node = newCSENode(fetched_value, "");
 			s_stack.push(result_node);
+		}
+
+		else if(temp->name == "gamma" && s_stack.top()->name == "<Y*>") {
+			
+			s_stack.pop(); //pop the ystar
+			c_control.pop(); //pop the gamma
+			
+			cseNode* eta = newCSENode("eta", "ETA");
+			cseNode* lambda = s_stack.top();
+
+			// assign values to eta
+			eta->i = lambda->i;
+			eta->x = lambda->x;
+			eta->k = lambda->k;
+
+			s_stack.pop(); //pop the lambda
+			s_stack.push(eta); //push the eta;
 		}
 
 		//if a variable is popped
