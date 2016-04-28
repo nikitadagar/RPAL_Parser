@@ -1,6 +1,6 @@
 #include "header.h"
 
-string const bi_operators[] = {"**", "+", "-", "*", "/", "<", ">", "<=", ">=", "or", "and", "eq", "gr", "ge", "ls", "le", "ne", "aug", "|"};
+string const bi_operators[] = {"aug", "**", "+", "-", "*", "/", "<", ">", "<=", ">=", "or", "and", "eq", "gr", "ge", "ls", "le", "ne", "aug", "|"};
 unordered_set<string> bi_ops(bi_operators, bi_operators + sizeof(bi_operators) / sizeof(bi_operators[0]));
 
 string const un_operators[] = {"not", "neg"};
@@ -60,7 +60,7 @@ void start_machine (unordered_map<string, cseNode>* envs[], stack<cseNode*> c_co
 			cseNode* lambda = s_stack.top(); s_stack.pop();	//pop and get lambda
 			cseNode* value_node = s_stack.top(); s_stack.pop(); 	//pop and get rand
 
-			cseNode* newEnv = createNextEnv (envs, s_stack.top()->k);	//new env node to add to stack and control
+			cseNode* newEnv = createNextEnv (envs, lambda->k);	//new env node to add to stack and control
 			c_control.push(newEnv);	//add env to control and stack
 			s_stack.push(newEnv);
 
@@ -68,7 +68,7 @@ void start_machine (unordered_map<string, cseNode>* envs[], stack<cseNode*> c_co
 			unordered_map<string, cseNode> *currentEnv = envs[env_count-1]; 	//get current env
 
 			//update current environment
-			if ( value_node->type == "tuple") {
+			if ( value_node->type == "tuple" && lambda->type == "n-ary") {
 				
 				string tup = value_node->name;  //get the VALUE tuple
 				tup = tup.substr(1, tup.length()-2);
@@ -159,9 +159,9 @@ void start_machine (unordered_map<string, cseNode>* envs[], stack<cseNode*> c_co
 			if(p != (*currentEnv).end()) {
 				cseNode* cn = &p->second;
 				s_stack.push(cn);
-			  }    
+			 }    
 			else{
-				cout << "ERROR : Key not in map.\n";
+				cout << "ERROR : Key : " << id << "  not in map.\n";
 			}
 			c_control.pop();
 		}
@@ -185,7 +185,7 @@ void start_machine (unordered_map<string, cseNode>* envs[], stack<cseNode*> c_co
 			
 			int deltaIndex; 	//to get the subscript of the delta node
 
-			string b = s_stack.top()->name;
+			string b = s_stack.top()->name;	//get the bool
 			
 			if (b == "<false>") {
 				
@@ -193,21 +193,21 @@ void start_machine (unordered_map<string, cseNode>* envs[], stack<cseNode*> c_co
 
 				if (del->type == "false") {
 					deltaIndex = del->i;
-					c_control.pop();
-					c_control.pop();
-					s_stack.pop();
+					c_control.pop();	//pop delta1
+					c_control.pop();	//pop delta2
+					s_stack.pop();		// pop the boolean
 					load_control(deltaIndex, c_control, deltas);
 				}
 				else {
-					cout << "ERROR : Expecting a false delta ttype in conditional operator";
+					cout << "ERROR : Expecting a false delta type in conditional operator";
 				}
 			}
 			else if (b == "<true>") {
-				c_control.pop();
+				c_control.pop();	//pop delta1
 				cseNode* del = c_control.top();
 				deltaIndex = del->i;
-				c_control.pop();
-				s_stack.pop();
+				c_control.pop();	//pop delta2
+				s_stack.pop();		//pop boolean
 				load_control(deltaIndex, c_control, deltas);
 			}
 
@@ -300,109 +300,95 @@ string extractStr (string name) {
 cseNode* bi_operation (string op, string rand1, string rand2) {	//TODO: complete
 	//rand1 op rand2
 
+	cseNode *n; 	//result node
+
 	if (op == "+") {
 		int result = extractInt(rand1) + extractInt(rand2);
-		cseNode *n = newCSENode (to_string(result), "int");
+		n = newCSENode (to_string(result), "int");
 		n->name = "<INT:" + n->name + ">";
-		return n;
 	}
 	else if (op == "-") {
 		int result = extractInt(rand1) - extractInt(rand2);
-		cseNode *n = newCSENode (to_string(result), "int");
+		n = newCSENode (to_string(result), "int");
 		n->name = "<INT:" + n->name + ">";
-		return n;
 	}
 	else if (op == "*") {
 		int result = extractInt(rand1) * extractInt(rand2);
-		cseNode *n = newCSENode (to_string(result), "int");
+		n = newCSENode (to_string(result), "int");
 		n->name = "<INT:" + n->name + ">";
-		return n;
 	}
 	else if (op == "/") {
 		int result = extractInt(rand1) / extractInt(rand2);
-		cseNode *n = newCSENode (to_string(result), "int");
+		n = newCSENode (to_string(result), "int");
 		n->name = "<INT:" + n->name + ">";
-		return n;
 	}
 	else if (op == "**") {
 		int result = pow(extractInt(rand1), extractInt(rand2));
-		cseNode *n = newCSENode (to_string(result), "int");
+		n = newCSENode (to_string(result), "int");
 		n->name = "<INT:" + n->name + ">";
-		return n;
 	}
 	else if (op == "<" || op == "ls") {
-		cseNode *n;
 		if (extractInt(rand1) < extractInt(rand2)) {
 			n = newCSENode ("<true>", "bool");
 		} else {
 			n = newCSENode ("<false>", "bool");
 		}
-		return n;
 	}
 	else if (op == "<=" || op == "le") {
-		cseNode *n;
 		if (extractInt(rand1) <= extractInt(rand2)) {
 			n = newCSENode ("<true>", "bool");
 		} else {
 			n = newCSENode ("<false>", "bool");
 		}
-		return n;
 	}
 	else if (op == ">" || op == "gr") {
-		cseNode *n;
 		if (extractInt(rand1) > extractInt(rand2)) {
 			n = newCSENode ("<true>", "bool");
 		} else {
 			n = newCSENode ("<false>", "bool");
 		}
-		return n;
 	}
 	else if (op == ">=" || op == "ge") {
-		cseNode *n;
 		if (extractInt(rand1) >= extractInt(rand2)) {
 			n = newCSENode ("<true>", "bool");
 		} else {
 			n = newCSENode ("<false>", "bool");
 		}
-		return n;
 	}
 	else if (op == "ne") {
-		cseNode *n;
 		if (extractInt(rand1) == extractInt(rand2)) {
 			n = newCSENode ("<false>", "bool");
 		} else {
 			n = newCSENode ("<true>", "bool");
 		}
-		return n;
 	}
 	else if (op == "eq") {
-		cseNode *n;
 		if (extractInt(rand1) == extractInt(rand2)) {
 			n = newCSENode ("<true>", "bool");
 		} else {
 			n = newCSENode ("<false>", "bool");
 		}
-		return n;
 	}
 	else if (op == "and") {
-		cseNode *n;
 		if (rand1 == "<true>" && rand2 == "<true>") {
 			n = newCSENode ("<true>", "bool");
 		} else {
 			n = newCSENode ("<false>", "bool");
 		}
-		return n;
 	}
 	else if (op == "or") {
-		cseNode *n;
 		if (rand1 == "<false>" && rand2 == "<false>") {
 			n = newCSENode ("<false>", "bool");
 		} else {
 			n = newCSENode ("<true>", "bool");
 		}
-		return n;
 	}
-	return NULL;
+	else if(op == "aug") {
+ 		string toInsert = ", " + rand2;
+ 		rand1.insert(rand1.length() - 1, toInsert);
+		n = newCSENode("TUPLE", rand1);
+  	}
+  	return n;
 }
 
 cseNode* un_operation (string op, string rand1) {
@@ -427,6 +413,7 @@ cseNode* un_operation (string op, string rand1) {
 }
 
 void myPrint (string name) {
+
 	if (isInt(name)) {
 		cout << extractInt(name);
 	}
@@ -435,6 +422,32 @@ void myPrint (string name) {
 	}
 	else if (isStr(name)) {
 		cout << extractStr(name);
+	}
+	else if(name == "<true>" || name == "<false>") {
+ 		cout << name.substr(1, name.length() - 2);
+  	}
+  	else if(name.at(0) == '(' && name.at(name.length()-1) == ')') {	//if tuple
+		
+		string commaValues = name.substr(1, name.length() - 2);
+		vector<string> result;
+		stringstream ss(commaValues);
+
+		while(ss.good()) {
+			string value;
+			getline(ss, value, ',');
+			value.erase(value.begin(), std::find_if(value.begin(), value.end(), std::bind1st(std::not_equal_to<char>(), ' ')));
+			result.push_back(value);
+		}
+
+		string output = "";
+		for(int i = 0; i < result.size(); i++) {
+			int t = extractInt(result[i]);  //TODO: ASSUMING TUPLES HAS INTEGERS ONLY
+			if(i >= 1) {
+				output = output + ", ";
+			}
+			output = output + to_string(t);
+		}
+		cout << output;
 	}
 }
 

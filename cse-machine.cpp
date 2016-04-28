@@ -66,7 +66,7 @@ void createControlStructure (Node* root, queue<cseNode*> &qu, int &count, Node* 
 					temp = temp + "," + root->child[0]->child[i]->name;
 				}
 			}
-
+			n->type = "n-ary";
 			n->x = temp;
 		}
 		else {
