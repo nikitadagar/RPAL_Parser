@@ -118,6 +118,27 @@ void start_machine (unordered_map<string, cseNode>* envs[], stack<cseNode*> c_co
 			s_stack.push(dummy);
 		}
 
+		else if(temp->name == "gamma" && s_stack.top()->name == "<ID:Stem>") {
+			c_control.pop(); //pop the gamma
+			s_stack.pop(); //pop the stem
+			string result = s_stack.top()->name;
+			s_stack.pop(); //pop the thing to be sterned
+
+			cseNode* node;
+			
+			if(isStr(result)) {
+				result = extractStr(result);
+				result = string(&result[0]);
+				node = newCSENode("<STR:'" + result.substr(0,1) + "'>", "");
+			} 
+			else if(isInt(result)) {
+				result = extractInt(result);
+				result = string(&result[0]);
+				node = newCSENode("<INT:" + result.substr(0,1) + ">", "");
+			}
+			s_stack.push(node);		
+		}
+
 		else if (temp->name == "gamma" && s_stack.top()->type == "tuple") {
 
 			c_control.pop();	//pop the gamma
@@ -386,7 +407,7 @@ cseNode* bi_operation (string op, string rand1, string rand2) {	//TODO: complete
 	else if(op == "aug") {
  		string toInsert = ", " + rand2;
  		rand1.insert(rand1.length() - 1, toInsert);
-		n = newCSENode("TUPLE", rand1);
+		n = newCSENode(rand1, "tuple");
   	}
   	return n;
 }
