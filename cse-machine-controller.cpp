@@ -139,6 +139,23 @@ void start_machine (unordered_map<string, cseNode>* envs[], stack<cseNode*> c_co
 			s_stack.push(node);		
 		}
 
+		else if(temp->name == "gamma" && s_stack.top()->name == "<ID:Conc>") {
+			c_control.pop();
+			c_control.pop(); //pop the two gammas
+			s_stack.pop(); //pop the conc
+
+			string st1 = s_stack.top()->name;
+			st1 = extractStr(st1);
+			s_stack.pop();
+			string st2 = s_stack.top()->name;
+			st2 = extractStr(st2);
+
+			string result = st1 + st2;
+			cseNode* node = newCSENode("<STR:'" + result + "'>", "");
+			s_stack.push(node);
+
+		}
+
 		else if (temp->name == "gamma" && s_stack.top()->type == "tuple") {
 
 			c_control.pop();	//pop the gamma

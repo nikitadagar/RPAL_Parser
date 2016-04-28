@@ -1,1 +1,2 @@
-let f x = Stem x in Print (f '222')
+let S = 'CIS' and T = '104B'
+in Print(Conc S T)

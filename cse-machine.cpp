@@ -118,7 +118,7 @@ void createControlStructure (Node* root, queue<cseNode*> &qu, int &count, Node* 
 
 	else {
 		n->name = root->name;
-		if (root->name == "<ID:Print>" || root->name == "<ID:Stem>") {
+		if (root->name == "<ID:Print>" || root->name == "<ID:Stem>" || root->name == "<ID:Conc>") {
 			n->type = "func";
 		}
 		qu.push(n);
