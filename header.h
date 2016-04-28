@@ -124,7 +124,7 @@ int extractInt (string);
 string extractID (string);
 cseNode* un_operation (string, string); 
 string augToTuple (string tuple, string val);
-void myPrint (string);
+void myPrint (cseNode*);
 
 #endif
 

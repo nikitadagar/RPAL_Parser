@@ -111,7 +111,7 @@ void start_machine (unordered_map<string, cseNode>* envs[], stack<cseNode*> c_co
 			c_control.pop();	//pop th gamma
 			s_stack.pop();	//pop the print node
 			string str = s_stack.top()->name;
-			myPrint(str);
+			myPrint(s_stack.top());
 
 			cseNode* dummy = newCSENode ("<dummy>", "dummy");
 			s_stack.pop();	//pop the node to be printed
@@ -412,7 +412,9 @@ cseNode* un_operation (string op, string rand1) {
 	}
 }
 
-void myPrint (string name) {
+void myPrint (cseNode* node) {
+
+	string name = node->name;
 
 	if (isInt(name)) {
 		cout << extractInt(name);
@@ -425,6 +427,9 @@ void myPrint (string name) {
 	}
 	else if(name == "<true>" || name == "<false>") {
  		cout << name.substr(1, name.length() - 2);
+  	}
+  	else if (name == "lambda") {
+  		cout << "[lambda closure: " << extractID(node->x) << ": " << node->i << "]";
   	}
   	else if(name.at(0) == '(' && name.at(name.length()-1) == ')') {	//if tuple
 		
@@ -439,7 +444,7 @@ void myPrint (string name) {
 			result.push_back(value);
 		}
 
-		string output = "";
+		string output = "(";
 		for(int i = 0; i < result.size(); i++) {
 			int t = extractInt(result[i]);  //TODO: ASSUMING TUPLES HAS INTEGERS ONLY
 			if(i >= 1) {
@@ -447,7 +452,7 @@ void myPrint (string name) {
 			}
 			output = output + to_string(t);
 		}
-		cout << output;
+		cout << output << ")";
 	}
 }
 
