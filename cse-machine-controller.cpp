@@ -60,7 +60,7 @@ void start_machine (unordered_map<string, cseNode>* envs[], stack<cseNode*> c_co
 			cseNode* lambda = s_stack.top(); s_stack.pop();	//pop and get lambda
 			cseNode* value_node = s_stack.top(); s_stack.pop(); 	//pop and get rand
 
-			cseNode* newEnv = createNextEnv (envs);	//new env node to add to stack and control
+			cseNode* newEnv = createNextEnv (envs, s_stack.top()->k);	//new env node to add to stack and control
 			c_control.push(newEnv);	//add env to control and stack
 			s_stack.push(newEnv);
 
@@ -245,6 +245,7 @@ void start_machine (unordered_map<string, cseNode>* envs[], stack<cseNode*> c_co
 		// cout << "Control : \n";  printStack(c_control);
 		// cout << "Stack : \n";    printStack(s_stack);
 	}
+	cout <<"\n";
 }
 
 string augToTuple (string tuple, string val) {
@@ -427,14 +428,13 @@ cseNode* un_operation (string op, string rand1) {
 
 void myPrint (string name) {
 	if (isInt(name)) {
-		cout << extractInt(name) << "\n";
+		cout << extractInt(name);
 	}
 	else if (isID(name)) {
-		cout << extractID(name) << "\n";
+		cout << extractID(name);
 	}
 	else if (isStr(name)) {
-		cout << extractStr(name) << "\n";
-		cout << "Hello\tWorld.\nHai";
+		cout << extractStr(name);
 	}
 }
 

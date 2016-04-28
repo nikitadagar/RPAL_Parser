@@ -107,7 +107,7 @@ void buildControls (Node*, queue<cseNode*>*[]);
 void createControlStructure (Node*, queue<cseNode*>&, int&, Node*[]);
 int countLambda (Node*); 
 cseNode* newCSENode (string, string);
-cseNode* createNextEnv (unordered_map<string, cseNode>*[]);
+cseNode* createNextEnv (unordered_map<string, cseNode>*[], int);
 void load_control (int, stack<cseNode*>&, queue<cseNode*>*[]);
 void printStack(stack<cseNode*>);
 void printMap (unordered_map<string, string>);

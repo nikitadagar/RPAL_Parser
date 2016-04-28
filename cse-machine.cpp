@@ -17,7 +17,7 @@ void run_machine (Node* root) {
 
 	// initializing the control and stack 
 	// adding e0 to both
-	cseNode* en = createNextEnv(envs);
+	cseNode* en = createNextEnv(envs, -1);
 	c_control.push(en);
 	s_stack.push(en);
 	load_control(0, c_control, deltas);
@@ -181,14 +181,14 @@ cseNode* newCSENode (string name, string type) {
 }
 
 //create next environment
-cseNode* createNextEnv (unordered_map<string, cseNode>* envs[]) {
+cseNode* createNextEnv (unordered_map<string, cseNode>* envs[], int k) {
 
 	cseNode* env = newCSENode ("e" + to_string(env_count),"env");	//new CSE Node of type env
 	envs[env_count] = new unordered_map<string, cseNode>;	//add empty env map to array of envs
 
-	if (!current_env.empty()){		//for all non primitive envs
+	if (k >= 0){		//for all non primitive envs
 		
-		int parentEnvInd = current_env.top();
+		int parentEnvInd = k;
 		unordered_map<string,cseNode> parentEnv = *envs[parentEnvInd];
 		unordered_map<string,cseNode> *currentEnv = envs[env_count];
 		(*currentEnv).insert(parentEnv.begin(), parentEnv.end()); //copy parent environment 
